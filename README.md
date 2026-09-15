@@ -1,195 +1,254 @@
 # Personal Homelab Infrastructure
 
-A self-hosted home infrastructure project built using **Proxmox VE** to gain practical experience in virtualization, Linux system administration, networking, DNS, VPNs, remote access, and server management.
+A personal self-hosted homelab built to gain practical experience with virtualization, Linux administration, networking, DNS, remote access, and server management.
 
-The homelab is continuously developed as a personal learning environment for experimenting with IT infrastructure and networking technologies.
+The infrastructure is built on **Proxmox VE** running on a small dedicated computer.
+
+---
+
+## Overview
+
+This project documents the design, configuration, troubleshooting, and future improvements of my personal homelab.
+
+The main goal is to build and manage real infrastructure rather than relying entirely on simulated environments.
+
+### Main Technologies
+
+* Proxmox VE
+* LXC Containers
+* QEMU Virtual Machines
+* Debian Linux
+* Xubuntu
+* Pi-hole
+* Tailscale
+* SSH
+* DNS
+* IPv4 Networking
+* Linux System Administration
+* Network Troubleshooting
 
 ---
 
 ## Architecture
 
-> Network architecture diagram will be added here.
-
-### Current Infrastructure
-
 ```text
-                         INTERNET
-                             │
-                     ┌───────▼───────┐
-                     │ Home Router   │
-                     │ 192.168.1.1   │
-                     └───────┬───────┘
-                             │
+                         Internet
+                            │
+                            │
+                     Home Router
+                      192.168.1.1
+                            │
                          Ethernet
-                             │
-                    ┌────────▼────────┐
-                    │    Proxmox      │
-                    │     darwish     │
-                    │ 192.168.1.120   │
-                    └────────┬────────┘
-                             │
-                           vmbr0
-                             │
-          ┌──────────────────┼──────────────────┐
-          │                  │                  │
-    ┌─────▼─────┐      ┌─────▼──────┐     ┌─────▼──────┐
-    │   CT100   │      │   CT101    │     │   VM103    │
-    │  Pi-hole  │      │ WireGuard  │     │ Minecraft  │
-    │192.168.1.121│    │192.168.1.155│    │192.168.1.159│
-    └───────────┘      │            │     └────────────┘
-                       │ 10.0.0.1/24│
-                       └────────────┘
+                            │
+                  ┌──────────────────┐
+                  │   Proxmox Host   │
+                  │     darwish      │
+                  │   192.168.1.120  │
+                  └────────┬─────────┘
+                           │
+                         vmbr0
+                           │
+              ┌────────────┴────────────┐
+              │                         │
+          LXC CT100                  VM103
+           Pi-hole                 Minecraft
+       192.168.1.121             192.168.1.159
+              │
+        DNS Filtering
 
-                    Tailscale
-                       │
-                       │
-                  Remote Access
-                       │
-                     Phone
+              ┌───────────────────────┐
+              │       Tailscale       │
+              │   Remote Management   │
+              └───────────┬───────────┘
+                          │
+                        Phone
+                    Remote Access
 ```
-
----
-
-## Technologies
-
-* Proxmox VE
-* Debian Linux
-* Xubuntu
-* LXC Containers
-* QEMU Virtual Machines
-* Pi-hole
-* WireGuard
-* Tailscale
-* SSH
-* DNS
-* IPv4 networking
-* Network troubleshooting
 
 ---
 
 ## Infrastructure
 
-### Proxmox VE
+| Component    | Purpose                    | Technology     |
+| ------------ | -------------------------- | -------------- |
+| Proxmox Host | Virtualization platform    | Proxmox VE     |
+| CT100        | Network-wide DNS filtering | Pi-hole        |
+| VM103        | Minecraft server           | Xubuntu + Java |
+| Tailscale    | Remote management          | VPN mesh       |
 
-**Version:** 9.2.5
-**Hostname:** `darwish`
-**LAN IP:** `192.168.1.120`
+---
 
-Proxmox VE is used as the primary virtualization platform for managing the homelab's virtual machines and LXC containers.
+## Proxmox
 
-The host uses `vmbr0` as its primary network bridge and is connected to the home network through Ethernet.
+The Proxmox server acts as the central virtualization platform for the homelab.
 
-### Pi-hole
+It provides:
 
-**Container:** CT100
-**IP:** `192.168.1.121`
-**Operating System:** Debian
-**CPU:** 1 core
-**Memory:** 512 MB
-**Storage:** 8 GB
+* Virtual machine management
+* LXC container management
+* Virtual networking
+* Resource allocation
+* Storage management
+* Centralized infrastructure administration
 
-Pi-hole provides DNS-based network-wide ad and tracker blocking.
+The Proxmox host uses the `vmbr0` network bridge to provide network connectivity to the containers and virtual machines.
 
-### WireGuard
+More information:
 
-**Container:** CT101
-**IP:** `192.168.1.155`
-**Operating System:** Debian
-**CPU:** 1 core
-**Memory:** 512 MB
-**Storage:** 4 GB
+`documentation/proxmox.md`
 
-WireGuard provides VPN connectivity to the home network.
+---
 
-The WireGuard interface uses:
+## Pi-hole
+
+Pi-hole runs inside an LXC container and provides network-wide DNS filtering.
+
+### Functions
+
+* DNS-based advertisement blocking
+* Tracker blocking
+* DNS query monitoring
+* Network-wide filtering
+* DNS troubleshooting
+
+The Pi-hole container is connected directly to the Proxmox network bridge.
+
+More information:
+
+`documentation/pihole.md`
+
+---
+
+## Minecraft Server
+
+A dedicated Xubuntu virtual machine hosts a vanilla Minecraft Java Edition server.
+
+The server is isolated from the Proxmox host and other infrastructure services.
+
+### Configuration
+
+* Minecraft Java Edition 1.21.8
+* Xubuntu
+* Java
+* 4 CPU cores
+* 5 GB RAM
+* 32 GB virtual disk
+* TCP port `25565`
+
+More information:
+
+`documentation/minecraft.md`
+
+---
+
+## Remote Management
+
+Tailscale is installed on the Proxmox host for secure remote management.
+
+This allows the Proxmox web interface to be accessed remotely without directly exposing the Proxmox management interface to the public internet.
+
+Example:
 
 ```text
-Network: 10.0.0.0/24
-Server: 10.0.0.1
+Phone
+  │
+  │ Mobile Data / Internet
+  │
+Tailscale
+  │
+  ▼
+Proxmox Host
+  │
+  ▼
+Proxmox Web Interface
 ```
 
-This allows authorized devices to establish a VPN connection to the homelab.
+More information:
 
-### Tailscale
+`documentation/tailscale.md`
 
-**Proxmox Tailscale IP:** `100.86.131.18`
+---
 
-Tailscale provides remote access to the homelab from outside the home network.
+## Troubleshooting
 
-It allows the Proxmox management interface to be accessed remotely without directly exposing the Proxmox web interface to the public internet.
+One of the main purposes of this project is to document real problems encountered while building and operating the infrastructure.
 
-### Minecraft Server
+### Examples
 
-**Virtual Machine:** VM103
-**IP:** `192.168.1.159`
-**Operating System:** Xubuntu
-**CPU:** 4 cores
-**Memory:** 5 GB
-**Storage:** 32 GB
+* Proxmox network configuration issues
+* DNS resolution problems
+* Pi-hole filtering issues
+* Minecraft server connectivity
+* Port forwarding
+* Virtual machine networking
+* Remote management
 
-A Minecraft Java Edition server is hosted inside a dedicated virtual machine.
+Troubleshooting documentation:
 
-The server is managed through Linux and SSH and provides practical experience with server administration, networking, and port forwarding.
+```text
+troubleshooting/
+├── proxmox-networking.md
+├── pihole-dns.md
+└── minecraft-server.md
+```
 
 ---
 
 ## Skills Demonstrated
 
+This project provides practical experience with:
+
 ### Virtualization
 
-* Proxmox VE administration
-* LXC container deployment
-* QEMU virtual machine management
-* CPU and memory allocation
-* Virtual storage management
+* Proxmox VE
+* LXC containers
+* QEMU virtual machines
 * Virtual networking
+* Resource allocation
 
-### Linux Administration
+### Linux
 
-* Debian administration
-* Xubuntu administration
+* Debian
+* Xubuntu
 * SSH
 * Linux networking
 * Service management
-* Package management
-* Command-line troubleshooting
+* Command-line administration
 
 ### Networking
 
 * IPv4 addressing
-* DHCP
+* Subnets
+* Default gateways
 * DNS
+* DHCP
 * Network bridges
-* VPN networking
 * Port forwarding
-* Local network troubleshooting
-* Remote network access
+* VPN-based remote access
 
-### Infrastructure Management
+### Infrastructure
 
-* Service deployment
-* Server configuration
+* Server deployment
+* Service isolation
+* Network troubleshooting
 * Remote administration
-* Network security
-* Troubleshooting
-* Resource management
+* Infrastructure documentation
 
 ---
 
-## Troubleshooting Experience
+## Lessons Learned
 
-This homelab has also been used as a practical environment for diagnosing real infrastructure problems.
+Building this homelab has provided hands-on experience with problems that are difficult to understand from theory alone.
 
-Examples include:
+Some of the most important lessons include:
 
-* Proxmox network connectivity problems
-* DNS resolution issues involving Pi-hole
-* Minecraft server connectivity problems
-* VPN connectivity troubleshooting
-* Remote access configuration
-* Network and IP address conflicts
-
-Detailed troubleshooting reports will be added to the `troubleshooting/` directory.
+* Understanding how virtual machines and containers connect to a physical network
+* Configuring Linux networking
+* Troubleshooting DNS resolution
+* Managing services remotely
+* Separating infrastructure services from application workloads
+* Diagnosing connectivity problems
+* Understanding the relationship between routers, DNS, virtual networks, and servers
 
 ---
 
@@ -197,23 +256,43 @@ Detailed troubleshooting reports will be added to the `troubleshooting/` directo
 
 Planned improvements include:
 
-* [ ] Proxmox backup strategy
-* [ ] Automated backups
-* [ ] Infrastructure monitoring
-* [ ] Uptime monitoring
-* [ ] Grafana and Prometheus
-* [ ] NAS integration
-* [ ] Network segmentation
-* [ ] Improved security controls
-* [ ] Infrastructure automation
-* [ ] Additional service deployment
+* Automated Proxmox backups
+* Dedicated backup storage
+* Infrastructure monitoring
+* Resource monitoring
+* Network segmentation
+* Improved security controls
+* Infrastructure automation
+* Additional self-hosted services
+* Better documentation and infrastructure diagrams
+
+---
+
+## Repository Structure
+
+```text
+personal-homelab/
+│
+├── README.md
+│
+├── documentation/
+│   ├── proxmox.md
+│   ├── pihole.md
+│   ├── tailscale.md
+│   └── minecraft.md
+│
+├── troubleshooting/
+│   ├── proxmox-networking.md
+│   ├── pihole-dns.md
+│   └── minecraft-server.md
+│
+└── diagrams/
+```
 
 ---
 
 ## Project Goals
 
-The primary goal of this project is to gain practical experience designing, deploying, managing, monitoring, and troubleshooting a small-scale IT infrastructure environment.
+The long-term goal of this project is to develop a practical understanding of infrastructure and systems administration by continuously building, maintaining, troubleshooting, and improving a real self-hosted environment.
 
-Rather than relying solely on theoretical knowledge, the homelab provides a controlled environment for experimenting with real infrastructure technologies and documenting the results.
-
-The project will continue to evolve as new technologies and services are introduced.
+This homelab also serves as a portfolio project demonstrating practical experience beyond academic coursework.
