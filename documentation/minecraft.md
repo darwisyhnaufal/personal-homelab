@@ -1,13 +1,3 @@
-Next is the **Minecraft server documentation**.
-
-Create:
-
-```text
-documentation/minecraft.md
-```
-
-Then paste this:
-
 # Minecraft Server
 
 ## Overview
