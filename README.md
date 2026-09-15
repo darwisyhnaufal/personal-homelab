@@ -93,10 +93,6 @@ It provides:
 
 The Proxmox host uses the `vmbr0` network bridge to provide network connectivity to the containers and virtual machines.
 
-More information:
-
-[Proxmox Documentation](documentation/proxmox.md)
-
 ---
 
 ## Pi-hole
