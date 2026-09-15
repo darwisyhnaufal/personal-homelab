@@ -95,7 +95,7 @@ The Proxmox host uses the `vmbr0` network bridge to provide network connectivity
 
 More information:
 
-`documentation/proxmox.md`
+[Proxmox Documentation](documentation/proxmox.md)
 
 ---
 
@@ -115,7 +115,7 @@ The Pi-hole container is connected directly to the Proxmox network bridge.
 
 More information:
 
-`documentation/pihole.md`
+[Pi-hole Documentation](documentation/pihole.md)
 
 ---
 
@@ -137,7 +137,7 @@ The server is isolated from the Proxmox host and other infrastructure services.
 
 More information:
 
-`documentation/minecraft.md`
+[Minecraft Server Documentation](documentation/minecraft.md)
 
 ---
 
@@ -165,7 +165,7 @@ Proxmox Web Interface
 
 More information:
 
-`documentation/tailscale.md`
+[Tailscale Documentation](documentation/tailscale.md)
 
 ---
 
@@ -183,14 +183,11 @@ One of the main purposes of this project is to document real problems encountere
 * Virtual machine networking
 * Remote management
 
-Troubleshooting documentation:
+### Troubleshooting Guides
 
-```text
-troubleshooting/
-├── proxmox-networking.md
-├── pihole-dns.md
-└── minecraft-server.md
-```
+* [Proxmox Networking](troubleshooting/proxmox-networking.md)
+* [Pi-hole DNS](troubleshooting/pihole-dns.md)
+* [Minecraft Server](troubleshooting/minecraft-server.md)
 
 ---
 
