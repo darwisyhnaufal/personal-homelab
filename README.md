@@ -41,7 +41,6 @@ The homelab is continuously developed as a personal learning environment for exp
                        └────────────┘
 
                     Tailscale
-                  100.86.131.18
                        │
                        │
                   Remote Access
