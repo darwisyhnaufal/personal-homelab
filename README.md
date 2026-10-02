@@ -41,57 +41,54 @@ The homelab currently includes:
 
 ## Architecture
 
-```text
-                              Internet
-                                 │
-                                 │
-                          Home Router
-                           192.168.1.1
-                                 │
-                              Ethernet
-                                 │
-                       ┌──────────────────┐
-                       │   Proxmox Host   │
-                       │     darwish      │
-                       │   192.168.1.120  │
-                       └────────┬─────────┘
-                                │
-                              vmbr0
-                                │
-              ┌─────────────────┼─────────────────┐
-              │                 │                 │
-              ▼                 ▼                 ▼
-         LXC CT100         LXC CT102         LXC CT104
-          Pi-hole          Monitoring        Uptime Kuma
-       192.168.1.121      192.168.1.122      192.168.1.124
-              │                 │                 │
-              │          ┌──────┼──────┐          │
-              │          │      │      │          │
-              │          ▼      ▼      ▼          │
-              │     Prometheus Grafana Blackbox   │
-              │          │             │           │
-              │          │        Service Probes  │
-              │          │                         │
-              │          ▼                         │
-              │     Alert Rules                    │
-              │          │                         │
-              │          └──────────┬──────────────┘
-              │                     │
-              │                     ▼
-              │              ntfy Notifications
-              │
-              ▼
-         DNS Filtering
+```mermaid
+flowchart TD
+    Internet((Internet))
+    Router["Home Router<br/>192.168.1.1"]
+    Proxmox["Proxmox Host<br/>darwish<br/>192.168.1.120"]
 
+    CT100["CT100 — Pi-hole<br/>192.168.1.121"]
+    CT102["CT102 — Monitoring<br/>192.168.1.122"]
+    CT104["CT104 — Uptime Kuma<br/>192.168.1.124"]
+    VM103["VM103 — Minecraft<br/>192.168.1.159<br/>Currently Stopped"]
 
-                     Tailscale
-                         │
-                         ▼
-                    Remote Device
-                      / Phone
-                         │
-                         ▼
-                 Home Network Services
+    Prometheus["Prometheus"]
+    Grafana["Grafana"]
+    PVE["PVE Exporter"]
+    Node["Node Exporter"]
+    Blackbox["Blackbox Exporter"]
+    Ntfy["ntfy Notifications"]
+
+    Tailscale["Tailscale"]
+    Phone["Remote Device / Phone"]
+
+    Internet --> Router
+    Router --> Proxmox
+
+    Proxmox --> CT100
+    Proxmox --> CT102
+    Proxmox --> CT104
+    Proxmox --> VM103
+
+    CT102 --> Prometheus
+    CT102 --> Grafana
+    CT102 --> PVE
+    CT102 --> Node
+    CT102 --> Blackbox
+
+    PVE --> Prometheus
+    Node --> Prometheus
+    Blackbox --> Prometheus
+
+    Prometheus --> Grafana
+    Prometheus --> Ntfy
+    CT104 --> Ntfy
+
+    Phone --> Tailscale
+    Tailscale --> Proxmox
+    Tailscale -.-> CT100
+    Tailscale -.-> CT102
+    Tailscale -.-> CT104
 ```
 
 > VM103 Minecraft Server previously hosted the Minecraft server but is currently stopped.
